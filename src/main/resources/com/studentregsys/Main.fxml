@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.studentregsys.MainController">
+    <VBox spacing="10">
+        <Label text="Student Registration System"/>
+        <Button fx:id="groupManagerButton" text="Group Manager" onAction="#openGroupManager"/>
+        <Button text="Manage Attendance" onAction="#manageAttendance"/>
+        <Button text="Export Students" onAction="#exportStudents"/>
+        <Button text="Import Students" onAction="#importStudents"/>
+        <Button text="Exit" onAction="#exit"/>
+    </VBox>
+</AnchorPane>
