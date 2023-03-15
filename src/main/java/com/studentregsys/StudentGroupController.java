@@ -37,15 +37,25 @@ public class StudentGroupController {
     private Label groupNameLabel;
     @FXML
     private Button backToMenuButton;
+    private GroupManager groupManager;
 
 
     private ObservableList<Student> students = FXCollections.observableArrayList();
     private StudentGroup studentGroup;
+    private DataManager dataManager;
 
     public StudentGroupController() {
     }
 
-    public void initStudentGroup(StudentGroup studentGroup) {
+    public void initGroupManager(GroupManager groupManager) {
+        this.groupManager = groupManager;
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    public void initData(StudentGroup studentGroup) {
         this.studentGroup = studentGroup;
         if (studentGroup != null) {
             students.setAll(studentGroup.getStudents());
@@ -53,6 +63,7 @@ public class StudentGroupController {
             studentTableView.setItems(students);
         }
     }
+
 
     public StudentGroupController(StudentGroup studentGroup) {
         this.studentGroup = studentGroup;
@@ -103,16 +114,16 @@ public class StudentGroupController {
 
     @FXML
     public void backToMenu() {
-
         try {
             Stage stage = (Stage) backToMenuButton.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
             Parent menuRoot = loader.load();
+            MainController mainController = loader.getController();
+            mainController.setDataManager(dataManager);
             Scene menuScene = new Scene(menuRoot);
             stage.setScene(menuScene);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }

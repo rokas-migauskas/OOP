@@ -11,6 +11,9 @@ public class GroupManager {
 
     }
 
+    public void setStudentGroups(List<StudentGroup> studentGroups) {
+        this.studentGroups = studentGroups;
+    }
     public List<StudentGroup> getStudentGroups() {
         return studentGroups;
     }
@@ -22,4 +25,12 @@ public class GroupManager {
     public void removeStudentGroup(StudentGroup studentGroup) {
         studentGroups.remove(studentGroup);
     }
+
+    @Override
+    public String toString() {
+        return "GroupManager{" +
+                "studentGroups=" + studentGroups +
+                '}';
+    }
+
 }

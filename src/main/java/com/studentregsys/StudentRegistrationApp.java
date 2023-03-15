@@ -4,21 +4,32 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class StudentRegistrationApp extends Application {
 
+    private GroupManager groupManager;
+
+    public StudentRegistrationApp() {
+        groupManager = new GroupManager();
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
-        AnchorPane root = loader.load();
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Student Registration System");
-        primaryStage.show();
+        DataManager dataManager = DataManager.getInstance();
+        dataManager.load();
+        GroupManager groupManager = dataManager.getGroupManager();
 
-        MainController.setPrimaryStage(primaryStage);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+        Parent root = loader.load();
+        MainController mainController = loader.getController();
+        mainController.initGroupManager(groupManager);
+        mainController.setDataManager(dataManager);
+        mainController.setPrimaryStage(primaryStage);
+
+        primaryStage.setTitle("Student Registration System");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
     }
 
     public static void main(String[] args) {

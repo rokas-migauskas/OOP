@@ -1,5 +1,7 @@
 package com.studentregsys;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,9 +11,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import javafx.fxml.Initializable;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
-public class GroupController {
+public class GroupController implements Initializable{
     @FXML
     private ListView<StudentGroup> studentGroupListView;
     @FXML
@@ -29,25 +36,44 @@ public class GroupController {
     private ObservableList<StudentGroup> studentGroups = FXCollections.observableArrayList();
     private GroupManager groupManager;
 
-
+    private DataManager dataManager;
     // Default constructor
     public GroupController() {
+        dataManager = DataManager.getInstance();
     }
 
     // Method to set the groupManager and update the list view
     public void initGroupManager(GroupManager groupManager) {
         this.groupManager = groupManager;
-        if (groupManager != null) {
-            studentGroups.setAll(groupManager.getStudentGroups());
-            studentGroupListView.setItems(studentGroups);
-        }
+        populateListView();
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+        populateListView();
     }
 
     public GroupController(GroupManager groupManager) {
         this.groupManager = groupManager;
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        studentGroupListView.setItems(studentGroups);
 
+        populateListView();
+    }
+
+
+    public void populateListView() {
+        if (groupManager != null) {
+            studentGroups.setAll(groupManager.getStudentGroups());
+        }
+    }
 
     public void setGroupManager(GroupManager groupManager) {
         this.groupManager = groupManager;
@@ -57,24 +83,25 @@ public class GroupController {
     }
 
     @FXML
-    private void openStudentGroupEditor() {
-        StudentGroup selectedGroup = studentGroupListView.getSelectionModel().getSelectedItem();
-        if (selectedGroup != null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("StudentGroup.fxml"));
-                Parent studentGroupRoot = loader.load();
-                Scene studentGroupScene = new Scene(studentGroupRoot);
-
-                StudentGroupController studentGroupController = loader.getController();
-                studentGroupController.setStudentGroup(selectedGroup);
-
-                Stage stage = (Stage) studentGroupListView.getScene().getWindow();
-                stage.setScene(studentGroupScene);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private void openStudentGroup() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("StudentGroup.fxml"));
+            Parent parent = loader.load();
+            StudentGroupController studentGroupController = loader.getController();
+            StudentGroup selectedGroup = studentGroupListView.getSelectionModel().getSelectedItem();
+            studentGroupController.initData(selectedGroup);
+            studentGroupController.setDataManager(dataManager);
+            Stage window = (Stage) studentGroupListView.getScene().getWindow();
+            Scene scene = new Scene(parent);
+            window.setTitle("Student Group");
+            window.setScene(scene);
+            window.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+
 
 
     @FXML
@@ -102,11 +129,8 @@ public class GroupController {
 
 
 
-    @FXML
-    public void initialize() {
-        setGroupManager(groupManager);
-        studentGroupListView.setItems(studentGroups);
-    }
+
+
 
     @FXML
     public void addStudentGroup() {
@@ -117,6 +141,10 @@ public class GroupController {
             studentGroups.add(newGroup);
             groupManager.addStudentGroup(newGroup);
             groupNameField.clear();
+
+            System.out.println("Group added: " + newGroup);
+            dataManager.setGroupManager(groupManager);
+            dataManager.save();
         }
     }
 
@@ -126,21 +154,33 @@ public class GroupController {
         if (selectedGroup != null) {
             studentGroups.remove(selectedGroup);
             groupManager.removeStudentGroup(selectedGroup);
+
+            dataManager.setGroupManager(groupManager);
+            dataManager.save();
         }
     }
 
     @FXML
     public void backToMenu() {
-
-
+        if (dataManager != null) {
+            dataManager.save();
+        } else {
+            System.err.println("DataManager is not initialized.");
+        }
         try {
             Stage stage = (Stage) backToMenuButton.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
             Parent menuRoot = loader.load();
             Scene menuScene = new Scene(menuRoot);
+            MainController mainController = loader.getController();
+            mainController.initGroupManager(groupManager);
+            mainController.setDataManager(dataManager);
             stage.setScene(menuScene);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
+
 }

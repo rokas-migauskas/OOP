@@ -5,6 +5,8 @@ module com.studentregsys {
     requires org.apache.poi.ooxml;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
+    requires layout;
+    requires kernel;
 
 
     opens com.studentregsys to javafx.fxml, com.fasterxml.jackson.databind;

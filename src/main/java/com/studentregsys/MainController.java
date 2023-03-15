@@ -1,5 +1,7 @@
 package com.studentregsys;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -7,20 +9,25 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.fxml.Initializable;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
+import java.util.ResourceBundle;
 
+import com.studentregsys.GroupManager;
 
-public class MainController {
+public class MainController{
     @FXML
     private Button groupManagerButton;
 
@@ -31,6 +38,7 @@ public class MainController {
 
     @FXML
     private Button manageAttendanceButton;
+
 
     @FXML
     private Button exportStudentsButton;
@@ -45,23 +53,34 @@ public class MainController {
 
     private List<StudentGroup> studentGroups;
     private static Stage primaryStage;
+    private DataManager dataManager;
 
     public MainController() {
-        this.groupManager = new GroupManager();
-        this.studentGroups = new ArrayList<>();
+        if (this.dataManager == null) {
+            this.dataManager = DataManager.getInstance();
+        }
+        if (this.groupManager == null) {
+            this.groupManager = new GroupManager();
+        }
+        if (this.studentGroups == null) {
+            this.studentGroups = new ArrayList<>();
+        }
+
     }
+
     public static void setPrimaryStage(Stage primaryStage) {
         MainController.primaryStage = primaryStage;
     }
 
-    @FXML
-    public void manageStudentGroups(ActionEvent actionEvent) throws IOException {
-        Parent parent = FXMLLoader.load(getClass().getResource("StudentGroup.fxml"));
-        Stage window = (Stage) ((Node)actionEvent.getSource()).getScene().getWindow();
-        Scene scene = new Scene(parent);
-        window.setTitle("Group Manager");
-        window.setScene(scene);
-        window.show();
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+
+
+
+    public void initGroupManager(GroupManager groupManager) {
+        this.groupManager = groupManager;
     }
 
     @FXML
@@ -75,16 +94,34 @@ public class MainController {
     }
 
     @FXML
-    private void openGroupManager(ActionEvent actionEvent) throws IOException{
+    private void openGroupManager(ActionEvent actionEvent) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Group.fxml"));
         Parent parent = loader.load();
         GroupController groupController = loader.getController();
         groupController.initGroupManager(groupManager);
-        Stage window = (Stage) ((Node)actionEvent.getSource()).getScene().getWindow();
+        groupController.setDataManager(dataManager);
+
+        Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         Scene scene = new Scene(parent);
         window.setTitle("Group Manager");
         window.setScene(scene);
         window.show();
+    }
+
+
+    public void updateGroupListView() {
+        if (groupManager != null) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Group.fxml"));
+            try {
+                loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            GroupController groupController = loader.getController();
+            groupController.initGroupManager(groupManager);
+            groupController.setDataManager(dataManager);
+            groupController.populateListView();
+        }
     }
 
 
@@ -142,8 +179,14 @@ public class MainController {
         }
     }
 
+
+
+
+
     @FXML
     public void exit() {
-        primaryStage.close();
+        dataManager.save();
+        Stage stage = (Stage) exitButton.getScene().getWindow();
+        stage.close();
     }
 }
