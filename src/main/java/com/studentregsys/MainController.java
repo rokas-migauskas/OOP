@@ -83,15 +83,26 @@ public class MainController{
         this.groupManager = groupManager;
     }
 
-    @FXML
-    public void manageAttendance(ActionEvent actionEvent) throws IOException {
-        Parent parent = FXMLLoader.load(getClass().getResource("Attendance.fxml"));
-        Stage window = (Stage) ((Node)actionEvent.getSource()).getScene().getWindow();
-        Scene scene = new Scene(parent);
-        window.setTitle("Attendance Manager");
-        window.setScene(scene);
-        window.show();
+    public void manageAttendance(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Attendance.fxml"));
+            Parent parent = loader.load();
+            AttendanceController attendanceController = loader.getController();
+            attendanceController.initGroupManager(groupManager);
+            attendanceController.setDataManager(dataManager);
+            attendanceController.populateGroupComboBox(); // Call this method here
+
+            Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            Scene scene = new Scene(parent);
+            window.setTitle("Attendance Manager");
+            window.setScene(scene);
+            window.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     @FXML
     private void openGroupManager(ActionEvent actionEvent) throws IOException {
@@ -101,6 +112,7 @@ public class MainController{
         groupController.initGroupManager(groupManager);
         groupController.setDataManager(dataManager);
 
+        groupController.populateListView();
         Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         Scene scene = new Scene(parent);
         window.setTitle("Group Manager");

@@ -47,6 +47,7 @@ public class StudentGroupController {
     public StudentGroupController() {
     }
 
+
     public void initGroupManager(GroupManager groupManager) {
         this.groupManager = groupManager;
     }
@@ -95,7 +96,10 @@ public class StudentGroupController {
         if (!firstName.isEmpty() && !lastName.isEmpty() && !studentID.isEmpty()) {
             Student newStudent = new Student(firstName, lastName, studentID);
             students.add(newStudent);
-            studentGroup.addStudent(newStudent);
+
+            // Update the student list in the groupManager
+            int groupIndex = groupManager.getStudentGroups().indexOf(studentGroup);
+            groupManager.getStudentGroups().get(groupIndex).addStudent(newStudent);
 
             firstNameField.clear();
             lastNameField.clear();
@@ -108,19 +112,30 @@ public class StudentGroupController {
         Student selectedStudent = studentTableView.getSelectionModel().getSelectedItem();
         if (selectedStudent != null) {
             students.remove(selectedStudent);
-            studentGroup.removeStudent(selectedStudent);
+
+            // Update the student list in the groupManager
+            int groupIndex = groupManager.getStudentGroups().indexOf(studentGroup);
+            groupManager.getStudentGroups().get(groupIndex).removeStudent(selectedStudent);
         }
     }
 
+
     @FXML
     public void backToMenu() {
+        if (dataManager != null) {
+            dataManager.save();
+        } else {
+            System.err.println("DataManager is not initialized.");
+        }
         try {
             Stage stage = (Stage) backToMenuButton.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
             Parent menuRoot = loader.load();
-            MainController mainController = loader.getController();
-            mainController.setDataManager(dataManager);
             Scene menuScene = new Scene(menuRoot);
+            MainController mainController = loader.getController();
+            mainController.initGroupManager(groupManager);
+            mainController.setDataManager(dataManager);
+
             stage.setScene(menuScene);
         } catch (IOException e) {
             e.printStackTrace();
