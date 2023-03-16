@@ -12,10 +12,25 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 public class PDFReport {
 
-    public void generateReport(List<Student> students, LocalDate startDate, LocalDate endDate, String fileName) throws IOException {
+    private GroupManager groupManager;
+
+    private DataManager dataManager;
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    public void initGroupManager(GroupManager groupManager) {
+        this.groupManager = groupManager;
+    }
+
+    public void generateReport(DataManager dataManager, LocalDate startDate, LocalDate endDate, String fileName) throws IOException {
+        List<Student> students = dataManager.getAllStudents();
+
         PdfWriter pdfWriter = new PdfWriter(fileName);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
         Document document = new Document(pdfDocument, PageSize.A4);
@@ -35,18 +50,26 @@ public class PDFReport {
                 .setItalic();
         document.add(dateRangeParagraph);
 
-        Table table = new Table(3).useAllAvailableWidth();
+        Table table = new Table(5).useAllAvailableWidth();
         table.addCell("First Name");
         table.addCell("Last Name");
         table.addCell("Student ID");
+        table.addCell("Group ID"); // Added Group ID header
+        table.addCell("Attendance");
 
         for (Student student : students) {
             table.addCell(student.getFirstName());
             table.addCell(student.getLastName());
             table.addCell(student.getStudentID());
+            table.addCell(student.getGroupName()); // Added group ID (group name) to the table
+
+            // Retrieve and add attendance information to the table
+            String attendance = dataManager.getAttendanceData(student, startDate, endDate);
+            table.addCell(attendance);
         }
 
         document.add(table);
         document.close();
     }
+
 }

@@ -14,6 +14,8 @@ public class StudentRegistrationApp extends Application {
         groupManager = new GroupManager();
     }
 
+
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         DataManager dataManager = DataManager.getInstance();

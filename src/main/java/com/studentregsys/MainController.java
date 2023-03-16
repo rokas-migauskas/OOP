@@ -1,7 +1,5 @@
 package com.studentregsys;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,23 +7,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.fxml.Initializable;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.List;
-import java.util.ResourceBundle;
-
-import com.studentregsys.GroupManager;
 
 public class MainController{
     @FXML
@@ -54,6 +42,8 @@ public class MainController{
     private List<StudentGroup> studentGroups;
     private static Stage primaryStage;
     private DataManager dataManager;
+    private DataIO csvIO;
+    private DataIO excelIO;
 
     public MainController() {
         if (this.dataManager == null) {
@@ -65,6 +55,8 @@ public class MainController{
         if (this.studentGroups == null) {
             this.studentGroups = new ArrayList<>();
         }
+        this.csvIO = new CSVIO();
+        this.excelIO = new ExcelIO();
 
     }
 
@@ -83,15 +75,26 @@ public class MainController{
         this.groupManager = groupManager;
     }
 
-    @FXML
-    public void manageAttendance(ActionEvent actionEvent) throws IOException {
-        Parent parent = FXMLLoader.load(getClass().getResource("Attendance.fxml"));
-        Stage window = (Stage) ((Node)actionEvent.getSource()).getScene().getWindow();
-        Scene scene = new Scene(parent);
-        window.setTitle("Attendance Manager");
-        window.setScene(scene);
-        window.show();
+    public void manageAttendance(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Attendance.fxml"));
+            Parent parent = loader.load();
+            AttendanceController attendanceController = loader.getController();
+            attendanceController.initGroupManager(groupManager);
+            attendanceController.setDataManager(dataManager);
+            attendanceController.populateGroupComboBox(); // Call this method here
+
+            Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            Scene scene = new Scene(parent);
+            window.setTitle("Attendance Manager");
+            window.setScene(scene);
+            window.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     @FXML
     private void openGroupManager(ActionEvent actionEvent) throws IOException {
@@ -101,6 +104,7 @@ public class MainController{
         groupController.initGroupManager(groupManager);
         groupController.setDataManager(dataManager);
 
+        groupController.populateListView();
         Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         Scene scene = new Scene(parent);
         window.setTitle("Group Manager");
@@ -108,45 +112,51 @@ public class MainController{
         window.show();
     }
 
+    @FXML
+    private void openReportWindow(ActionEvent actionEvent) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Report.fxml"));
+        Parent parent = loader.load();
+        ReportController reportController = loader.getController();
+        reportController.setDataManager(dataManager);
+        reportController.initGroupManager(groupManager);
 
-    public void updateGroupListView() {
-        if (groupManager != null) {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Group.fxml"));
-            try {
-                loader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            GroupController groupController = loader.getController();
-            groupController.initGroupManager(groupManager);
-            groupController.setDataManager(dataManager);
-            groupController.populateListView();
-        }
+        Stage window = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        Scene scene = new Scene(parent);
+        window.setTitle("Report Generator");
+        window.setScene(scene);
+        window.show();
     }
+
+
+
+
+
 
 
     @FXML
     public void exportStudents() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Students Data");
+        fileChooser.setTitle("Export Students");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV Files", "*.csv"),
                 new FileChooser.ExtensionFilter("Excel Files", "*.xlsx")
         );
+        File file = fileChooser.showSaveDialog(primaryStage);
 
-        File selectedFile = fileChooser.showSaveDialog(primaryStage);
-        if (selectedFile != null) {
-            String fileName = selectedFile.getAbsolutePath();
-            try {
-                if (fileName.endsWith(".csv")) {
-                    CSVDataExport csvDataExport = new CSVDataExport();
-                    csvDataExport.exportStudents(studentGroup.getStudents(), fileName);
-                } else if (fileName.endsWith(".xlsx")) {
-                    ExcelDataExport excelDataExport = new ExcelDataExport();
-                    excelDataExport.exportStudents(studentGroup.getStudents(), fileName);
+        if (file != null) {
+            String fileName = file.getName();
+            if (fileName.endsWith(".csv")) {
+                try {
+                    csvIO.exportStudents(dataManager.getGroupManager().getAllStudents(), file.getAbsolutePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else if (fileName.endsWith(".xlsx")) {
+                try {
+                    excelIO.exportStudents(dataManager.getGroupManager().getAllStudents(), file.getAbsolutePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -154,32 +164,52 @@ public class MainController{
     @FXML
     public void importStudents() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Students Data");
+        fileChooser.setTitle("Import Students");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV Files", "*.csv"),
                 new FileChooser.ExtensionFilter("Excel Files", "*.xlsx")
         );
+        File file = fileChooser.showOpenDialog(primaryStage);
 
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
-        if (selectedFile != null) {
-            String fileName = selectedFile.getAbsolutePath();
+        if (file != null) {
             try {
+                String fileName = file.getName();
+                List<Student> importedStudents;
                 if (fileName.endsWith(".csv")) {
-                    CSVDataExport csvDataExport = new CSVDataExport();
-                    List<Student> importedStudents = csvDataExport.importStudents(fileName);
-                    studentGroup.getStudents().addAll(importedStudents);
+                    importedStudents = csvIO.importStudents(file.getAbsolutePath());
                 } else if (fileName.endsWith(".xlsx")) {
-                    ExcelDataExport excelDataExport = new ExcelDataExport();
-                    List<Student> importedStudents = excelDataExport.importStudents(fileName);
-                    studentGroup.getStudents().addAll(importedStudents);
+                    importedStudents = excelIO.importStudents(file.getAbsolutePath());
+                } else {
+                    return;
                 }
+
+                for (Student student : importedStudents) {
+                    String groupName = student.getGroupName();
+                    StudentGroup studentGroup = null;
+
+                    // Find the group with the same name
+                    for (StudentGroup group : groupManager.getStudentGroups()) {
+                        if (group.getGroupName().equals(groupName)) {
+                            studentGroup = group;
+                            break;
+                        }
+                    }
+
+                    // If the group doesn't exist, create a new group and add it to the group manager
+                    if (studentGroup == null) {
+                        studentGroup = new StudentGroup(groupName);
+                        groupManager.addStudentGroup(studentGroup);
+                    }
+
+                    // Add the imported student to the group
+                    studentGroup.addStudent(student);
+                }
+                dataManager.save(); // Save the imported data
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-
-
 
 
 

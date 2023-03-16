@@ -26,11 +26,27 @@ public class GroupManager {
         studentGroups.remove(studentGroup);
     }
 
+    public StudentGroup findGroupByName(String groupName) {
+        for (StudentGroup group : studentGroups) {
+            if (group.getGroupName().equals(groupName)) {
+                return group;
+            }
+        }
+        return null;
+    }
     @Override
     public String toString() {
         return "GroupManager{" +
                 "studentGroups=" + studentGroups +
                 '}';
+    }
+
+    public List<Student> getAllStudents() {
+        List<Student> allStudents = new ArrayList<>();
+        for (StudentGroup group : studentGroups) {
+            allStudents.addAll(group.getStudents());
+        }
+        return allStudents;
     }
 
 }

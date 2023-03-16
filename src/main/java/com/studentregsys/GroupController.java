@@ -82,27 +82,6 @@ public class GroupController implements Initializable{
         }
     }
 
-    @FXML
-    private void openStudentGroup() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("StudentGroup.fxml"));
-            Parent parent = loader.load();
-            StudentGroupController studentGroupController = loader.getController();
-            StudentGroup selectedGroup = studentGroupListView.getSelectionModel().getSelectedItem();
-            studentGroupController.initData(selectedGroup);
-            studentGroupController.setDataManager(dataManager);
-            Stage window = (Stage) studentGroupListView.getScene().getWindow();
-            Scene scene = new Scene(parent);
-            window.setTitle("Student Group");
-            window.setScene(scene);
-            window.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 
     @FXML
     public void editGroup() {
@@ -116,6 +95,8 @@ public class GroupController implements Initializable{
 
                 StudentGroupController studentGroupController = loader.getController();
                 studentGroupController.setStudentGroup(selectedGroup);
+                studentGroupController.initGroupManager(groupManager);
+                studentGroupController.setDataManager(dataManager);
 
                 Stage stage = (Stage) studentGroupListView.getScene().getWindow();
                 stage.setScene(studentGroupScene);
