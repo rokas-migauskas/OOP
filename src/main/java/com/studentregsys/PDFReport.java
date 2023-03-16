@@ -61,7 +61,7 @@ public class PDFReport {
             table.addCell(student.getFirstName());
             table.addCell(student.getLastName());
             table.addCell(student.getStudentID());
-            table.addCell(student.getGroupName()); // Added group ID (group name) to the table
+            table.addCell(student.getGroupName());
 
             // Retrieve and add attendance information to the table
             String attendance = dataManager.getAttendanceData(student, startDate, endDate);
