@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.studentregsys.ReportController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20"/>
+    </padding>
+    <Label text="Select date range:"/>
+    <HBox spacing="10">
+        <Label text="Start Date:"/>
+        <DatePicker fx:id="startDatePicker"/>
+    </HBox>
+    <HBox spacing="10">
+        <Label text="End Date:"/>
+        <DatePicker fx:id="endDatePicker"/>
+    </HBox>
+    <Button fx:id="generateReportButton" text="Generate Report" onAction="#generateReport"/>
+</VBox>

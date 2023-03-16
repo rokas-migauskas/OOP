@@ -15,6 +15,7 @@
         <Button text="Manage Attendance" onAction="#manageAttendance"/>
         <Button text="Export Students" onAction="#exportStudents"/>
         <Button text="Import Students" onAction="#importStudents"/>
+        <Button text="Generate Report" onAction="#openReportWindow"/>
         <Button fx:id="exitButton" text="Exit" onAction="#exit"/>
     </VBox>
 </AnchorPane>

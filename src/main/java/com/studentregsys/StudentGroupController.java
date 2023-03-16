@@ -95,6 +95,7 @@ public class StudentGroupController {
 
         if (!firstName.isEmpty() && !lastName.isEmpty() && !studentID.isEmpty()) {
             Student newStudent = new Student(firstName, lastName, studentID);
+            newStudent.setGroupName(studentGroup.getGroupName());
             students.add(newStudent);
 
             // Update the student list in the groupManager
@@ -104,6 +105,9 @@ public class StudentGroupController {
             firstNameField.clear();
             lastNameField.clear();
             studentIDField.clear();
+            System.out.println("Student added: " + newStudent);
+            dataManager.setGroupManager(groupManager);
+            dataManager.save();
         }
     }
 
@@ -116,6 +120,8 @@ public class StudentGroupController {
             // Update the student list in the groupManager
             int groupIndex = groupManager.getStudentGroups().indexOf(studentGroup);
             groupManager.getStudentGroups().get(groupIndex).removeStudent(selectedStudent);
+            dataManager.setGroupManager(groupManager);
+            dataManager.save();
         }
     }
 

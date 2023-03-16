@@ -5,7 +5,9 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Student extends Person {
@@ -13,7 +15,7 @@ public class Student extends Person {
 
     private Map<LocalDate, Boolean> attendance;
 
-
+    private String groupName;
 
     public Student() {
     }
@@ -54,5 +56,13 @@ public class Student extends Person {
 
     public void setAttendance(Map<LocalDate, Boolean> attendance) {
         this.attendance = attendance;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

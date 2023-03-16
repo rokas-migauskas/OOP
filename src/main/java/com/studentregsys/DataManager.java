@@ -5,6 +5,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DataManager {
     private GroupManager groupManager;
@@ -28,6 +33,27 @@ public class DataManager {
         objectMapper.registerModule(new JavaTimeModule()); // Needed for LocalDate serialization
     }
 
+
+    public String getAttendanceData(Student student, LocalDate startDate, LocalDate endDate) {
+        int daysPresent = 0;
+        int totalDays = 0;
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            totalDays++;
+            if (student.isPresent(date)) {
+                daysPresent++;
+            }
+        }
+
+        return daysPresent + "/" + totalDays;
+    }
+    public List<Student> getAllStudents() {
+        List<Student> allStudents = new ArrayList<>();
+        for (StudentGroup group : groupManager.getStudentGroups()) {
+            allStudents.addAll(group.getStudents());
+        }
+        return allStudents;
+    }
     public GroupManager getGroupManager() {
         return groupManager;
     }
