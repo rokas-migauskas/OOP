@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ListView?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.studentregsys.StudentGroupController">
+    <VBox spacing="10">
+
+        <Label text="Student Group Editor"/>
+        <Label fx:id="groupNameLabel" />
+        <TableView fx:id="studentTableView">
+            <columns>
+                <TableColumn fx:id="firstNameColumn" text="First Name" prefWidth="100"/>
+                <TableColumn fx:id="lastNameColumn" text="Last Name" prefWidth="100"/>
+                <TableColumn fx:id="studentIDColumn" text="Student ID" prefWidth="100"/>
+            </columns>
+        </TableView>
+        <GridPane hgap="10" vgap="10">
+            <TextField fx:id="firstNameField" GridPane.columnIndex="0" GridPane.rowIndex="0" promptText="First Name"/>
+            <TextField fx:id="lastNameField" GridPane.columnIndex="1" GridPane.rowIndex="0" promptText="Last Name"/>
+            <TextField fx:id="studentIDField" GridPane.columnIndex="2" GridPane.rowIndex="0" promptText="Student ID"/>
+        </GridPane>
+        <Button fx:id="addButton" text="Add Student" onAction="#addStudent"/>
+        <Button fx:id="removeButton" text="Remove Student" onAction="#removeStudent"/>
+        <Button fx:id="backToMenuButton" text="Back to Menu" onAction="#backToMenu" />
+
+    </VBox>
+</AnchorPane>
