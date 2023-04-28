@@ -1,0 +1,24 @@
+[ {
+  "name" : "room1",
+  "users" : [ {
+    "username" : "petras"
+  }, {
+    "username" : "jonas"
+  } ],
+  "messages" : [ {
+    "senderUsername" : "jonas",
+    "content" : "ppp"
+  }, {
+    "senderUsername" : "petras",
+    "content" : "asd"
+  } ]
+}, {
+  "name" : "room3",
+  "users" : [ {
+    "username" : "jonas"
+  } ],
+  "messages" : [ {
+    "senderUsername" : "jonas",
+    "content" : "lok"
+  } ]
+} ]
